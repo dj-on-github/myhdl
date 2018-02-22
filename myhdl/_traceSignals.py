@@ -83,8 +83,11 @@ class _TraceSignalsClass(object):
                 sys.setprofile(None)
 
         from myhdl.conversion import _toVerilog
+        from myhdl.conversion import _toSystemVerilog
         if _toVerilog._converting:
             raise TraceSignalsError("Cannot use traceSignals while converting to Verilog")
+        if _toSystemVerilog._converting:
+            raise TraceSignalsError("Cannot use traceSignals while converting to SystemVerilog")
         if not isinstance(dut, _Block):
             if not callable(dut):
                 raise TraceSignalsError(_error.ArgType, "got %s" % type(dut))

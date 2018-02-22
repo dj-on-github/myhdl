@@ -31,7 +31,7 @@ from myhdl import BlockError, BlockInstanceError, Cosimulation
 from myhdl._instance import _Instantiator
 from myhdl._util import _flatten
 from myhdl._extractHierarchy import (_makeMemInfo,
-                                     _UserVerilogCode, _UserVhdlCode)
+                                     _UserVerilogCode, _UserSystemVerilogCode, _UserVhdlCode)
 from myhdl._Signal import _Signal, _isListOfSigs
 
 
@@ -158,10 +158,13 @@ class _Block(object):
         self.subs = _flatten(func(*args, **kwargs))
         self._verifySubs()
         self._updateNamespaces()
-        self.verilog_code = self.vhdl_code = None
+        self.verilog_code = self.systemverilog_code = self.vhdl_code = None
         self.sim = None
         if hasattr(deco, 'verilog_code'):
             self.verilog_code = _UserVerilogCode(deco.verilog_code, self.symdict, func.__name__,
+                                                 func, srcfile, srcline)
+        if hasattr(deco, 'systemverilog_code'):
+            self.verilog_code = _UserSystemVerilogCode(deco.verilog_code, self.symdict, func.__name__,
                                                  func, srcfile, srcline)
         if hasattr(deco, 'vhdl_code'):
             self.vhdl_code = _UserVhdlCode(deco.vhdl_code, self.symdict, func.__name__,
@@ -259,6 +262,8 @@ class _Block(object):
             converter = myhdl.conversion._toVHDL.toVHDL
         elif hdl.lower() == 'verilog':
             converter = myhdl.conversion._toVerilog.toVerilog
+        elif hdl.lower() == 'systemverilog':
+            converter = myhdl.conversion._toSystemVerilog.toSystemVerilog
         else:
             raise BlockInstanceError('unknown hdl %s' % hdl)
 
@@ -267,6 +272,10 @@ class _Block(object):
             conv_attrs['name'] = kwargs.pop('name')
         conv_attrs['directory'] = kwargs.pop('path', '')
         if hdl.lower() == 'verilog':
+            conv_attrs['no_testbench'] = not kwargs.pop('testbench', True)
+            conv_attrs['timescale'] = kwargs.pop('timescale', '1ns/10ps')
+            conv_attrs['trace'] = kwargs.pop('trace', False)
+        if hdl.lower() == 'systemverilog':
             conv_attrs['no_testbench'] = not kwargs.pop('testbench', True)
             conv_attrs['timescale'] = kwargs.pop('timescale', '1ns/10ps')
             conv_attrs['trace'] = kwargs.pop('trace', False)

@@ -47,6 +47,7 @@ ResetSignal --
 enum -- function that returns an enumeration type
 traceSignals -- function that enables signal tracing in a VCD file
 toVerilog -- function that converts a design to Verilog
+toSystemVerilog -- function that converts a design to SystemVerilog
 
 """
 from __future__ import absolute_import
@@ -122,6 +123,9 @@ class ConversionError(Error):
 class ToVerilogError(ConversionError):
     pass
 
+class ToSystemVerilogError(ConversionError):
+    pass
+
 
 class ToVHDLError(ConversionError):
     pass
@@ -132,6 +136,9 @@ class ConversionWarning(UserWarning):
 
 
 class ToVerilogWarning(ConversionWarning):
+    pass
+
+class ToSystemVerilogWarning(ConversionWarning):
     pass
 
 
@@ -168,6 +175,7 @@ from ._traceSignals import traceSignals
 
 from myhdl import conversion
 from .conversion import toVerilog
+from .conversion import toSystemVerilog
 from .conversion import toVHDL
 
 from ._tristate import Tristate
@@ -202,6 +210,7 @@ __all__ = ["bin",
            "EnumItemType",
            "traceSignals",
            "toVerilog",
+           "toSystemVerilog",
            "toVHDL",
            "conversion",
            "Tristate"

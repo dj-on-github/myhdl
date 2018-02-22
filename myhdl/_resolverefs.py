@@ -43,7 +43,7 @@ class _AttrRefTransformer(ast.NodeTransformer):
         self.generic_visit(node)
 
         reserved = ('next', 'posedge', 'negedge', 'max', 'min', 'val', 'signed',
-                    'verilog_code', 'vhdl_code')
+                    'verilog_code', 'systemverilog_code', 'vhdl_code')
         if node.attr in reserved:
             return node
 

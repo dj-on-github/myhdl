@@ -107,6 +107,15 @@ def enum(*names, **kwargs):
                     val = val.replace('1', '?')
             return "%d'b%s" % (self._nrbits, val)
 
+        def _toSystemVerilog(self, dontcare=False):
+            val = self._val
+            if dontcare:
+                if encoding == "one_hot":
+                    val = val.replace('0', '?')
+                elif encoding == "one_cold":
+                    val = val.replace('1', '?')
+            return "%d'b%s" % (self._nrbits, val)
+
         def _toVHDL(self):
             return self._name
 

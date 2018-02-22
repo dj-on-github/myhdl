@@ -130,6 +130,11 @@ class _UserVerilogCode(_UserCode):
     def raiseError(self, msg, info):
         raise ToVerilogError("Error in user defined Verilog code", msg, info)
 
+class _UserSystemVerilogCode(_UserCode):
+
+    def raiseError(self, msg, info):
+        raise ToSystemVerilogError("Error in user defined SystemVerilog code", msg, info)
+
 
 class _UserVhdlCode(_UserCode):
 
@@ -138,6 +143,9 @@ class _UserVhdlCode(_UserCode):
 
 
 class _UserVerilogCodeDepr(_UserVerilogCode, _UserCodeDepr):
+    pass
+
+class _UserSystemVerilogCodeDepr(_UserSystemVerilogCode, _UserCodeDepr):
     pass
 
 
@@ -160,6 +168,20 @@ class _UserVerilogInstance(_UserVerilogCode):
         s += "\n);\n\n"
         return s
 
+class _UserSystemVerilogInstance(_UserSystemVerilogCode):
+
+    def __str__(self):
+        args = inspect.getargspec(self.func)[0]
+        s = "%s %s(" % (self.funcname, self.code)
+        sep = ''
+        for arg in args:
+            if arg in self.namespace and isinstance(self.namespace[arg], _Signal):
+                signame = self.namespace[arg]._name
+                s += sep
+                sep = ','
+                s += "\n    .%s(%s)" % (arg, signame)
+        s += "\n);\n\n"
+        return s
 
 class _UserVhdlInstance(_UserVhdlCode):
 
@@ -181,10 +203,13 @@ class _UserVhdlInstance(_UserVhdlCode):
 def _addUserCode(specs, arg, funcname, func, frame):
     classMap = {
         '__verilog__': _UserVerilogCodeDepr,
+        '__systemverilog__': _UserSystemVerilogCodeDepr,
         '__vhdl__': _UserVhdlCodeDepr,
         'verilog_code': _UserVerilogCode,
+        'systemverilog_code': _UserSystemVerilogCode,
         'vhdl_code': _UserVhdlCode,
         'verilog_instance': _UserVerilogInstance,
+        'systemverilog_instance': _UserSystemVerilogInstance,
         'vhdl_instance': _UserVhdlInstance,
 
     }

@@ -70,6 +70,9 @@ class _PosedgeWaiterList(_WaiterList):
     def _toVerilog(self):
         return "posedge %s" % self.sig._name
 
+    def _toSystemVerilog(self):
+        return "posedge %s" % self.sig._name
+
     def _toVHDL(self):
         return "rising_edge(%s)" % self.sig._name
 
@@ -80,6 +83,9 @@ class _NegedgeWaiterList(_WaiterList):
         self.sig = sig
 
     def _toVerilog(self):
+        return "negedge %s" % self.sig._name
+
+    def _toSystemVerilog(self):
         return "negedge %s" % self.sig._name
 
     def _toVHDL(self):
@@ -123,7 +129,7 @@ class _Signal(object):
                  '_code', '_tracing', '_nrbits', '_checkVal',
                  '_setNextVal', '_copyVal2Next', '_printVcd',
                  '_driven', '_read', '_name', '_used', '_inList',
-                 '_waiter', 'toVHDL', 'toVerilog', '_slicesigs',
+                 '_waiter', 'toVHDL', 'toVerilog', 'toSystemVerilog', '_slicesigs',
                  '_numeric'
                  )
 
@@ -543,6 +549,9 @@ class _Signal(object):
     def _toVerilog(self):
         return self._name
 
+    def _toSystemVerilog(self):
+        return self._name
+
     # augmented assignment not supported
     def _augm(self):
         raise TypeError("Signal object doesn't support augmented assignment")
@@ -573,8 +582,12 @@ class _Signal(object):
         def toVerilog():
             return "assign %s = %s;" % (self._name, sig._name)
 
+        def toSystemVerilog():
+            return "assign %s = %s;" % (self._name, sig._name)
+
         self.toVHDL = toVHDL
         self.toVerilog = toVerilog
+        self.toSystemVerilog = toSystemVerilog
 
 
 class _DelayedSignal(_Signal):

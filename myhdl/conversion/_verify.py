@@ -13,6 +13,7 @@ import myhdl
 from myhdl._Simulation import Simulation
 from myhdl.conversion._toVHDL import toVHDL
 from myhdl.conversion._toVerilog import toVerilog
+from myhdl.conversion._toSystemVerilog import toSystemVerilog
 from myhdl._block import _Block
 
 _version = myhdl.__version__.replace('.', '')
@@ -28,7 +29,7 @@ def registerSimulator(name=None, hdl=None, analyze=None, elaborate=None, simulat
                       skiplines=None, skipchars=None, ignore=None):
     if not isinstance(name, str) or (name.strip() == ""):
         raise ValueError("Invalid simulator name")
-    if hdl not in ("VHDL", "Verilog"):
+    if hdl not in ("VHDL", "Verilog","SystemVerilog"):
         raise ValueError("Invalid hdl %s" % hdl)
     if not isinstance(analyze, str) or (analyze.strip() == ""):
         raise ValueError("Invalid analyzer command")
@@ -111,6 +112,8 @@ class _VerificationClass(object):
         hdl = hdlsim.hdl
         if hdl == 'Verilog' and toVerilog.name is not None:
             name = toVerilog.name
+        elif hdl == 'SystemVerilog' and toSystemVerilog.name is not None:
+            name = toSystemVerilog.name
         elif hdl == 'VHDL' and toVHDL.name is not None:
             name = toVHDL.name
         elif isinstance(func, _Block):
@@ -140,11 +143,15 @@ class _VerificationClass(object):
         if isinstance(func, _Block):
             if hdl == "VHDL":
                 inst = func.convert(hdl='VHDL')
+            elif hdl == "SystemVerilog":
+                inst = func.convert(hdl='SystemVerilog')
             else:
                 inst = func.convert(hdl='Verilog')
         else:
             if hdl == "VHDL":
                 inst = toVHDL(func, *args, **kwargs)
+            elif hdl == "SystemVerilog":
+                inst = toSystemVerilog(func, *args, **kwargs)
             else:
                 inst = toVerilog(func, *args, **kwargs)
 
